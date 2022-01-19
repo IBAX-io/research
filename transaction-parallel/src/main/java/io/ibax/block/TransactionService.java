@@ -12,12 +12,12 @@ import java.util.Set;
 
 public class TransactionService {
 	
-	public List<Transaction> getTransactionList() {
+	public List<Transaction> getTransactionList(int num) {
 		Random random = new Random();
 		List<Transaction> txs = new ArrayList<Transaction>();
 		
-		for (int i=0; i<100; i++) {
-			txs.add(new Transaction(random.nextInt(99), random.nextInt(99)));
+		for (int i=0; i<num; i++) {
+			txs.add(new Transaction(random.nextInt(num-1), random.nextInt(num-1)));
 		}
 		
 		Collections.sort(txs, new Comparator<Transaction>() {
