@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="io.ibax.mapper.ContractsMapper">
+  <resultMap id="ContractsMap" type="Contracts">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="value" column="value"/>
+		<result property="walletId" column="wallet_id"/>
+		<result property="tokenId" column="token_id"/>
+		<result property="conditions" column="conditions"/>
+		<result property="appId" column="app_id"/>
+		<result property="ecosystem" column="ecosystem"/>
+		
+	</resultMap>
+	
+	<select id="getContractsList" resultMap="ContractsMap">
+    	select * from "1_contracts" c order by c."name"  asc 
+  	</select>
+	
+</mapper>

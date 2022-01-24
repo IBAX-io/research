@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>contractsRelation</title>
+		
+		<style type="text/css">
+			
+			table,table tr th, table tr td { border:1px solid #0094ff; }
+		</style>
+	</head>
+
+	<body>
+		<div class="container-fluid">
+			<table class="" >
+				<thead>
+					<tr>
+						<th>contracts</th>
+						<th>contractsRelation</th>
+					</tr>
+				</thead>
+				<tbody th:each="mapEntry: ${maps}">
+					<tr>
+						<td th:text="${mapEntry.key}"></td>
+						<td th:each="contracts: ${mapEntry.value}"><label th:text="${contracts.getName()}"></label></td>
+					</tr>
+					
+				</tbody>
+			</table>
+		</div>
+
+	</body>
+
+</html>
