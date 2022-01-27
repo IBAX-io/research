@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import io.ibax.model.Contracts;
+import io.ibax.model.ContractsRelation;
 import io.ibax.service.ContractsService;
 
 @Controller
@@ -35,6 +36,16 @@ public class HelloController {
         model.addAttribute("maps",maps);
 
         return "contracts/list";
+        
+	}
+	
+	@GetMapping("/hello2")
+	public String getContractsRelationList1(Model model) {
+		List<ContractsRelation> contractsRelationList = contractsService.getContractsRelationList1();
+		
+        model.addAttribute("contractsRelationList",contractsRelationList);
+
+        return "contracts/list2";
         
 	}
 }

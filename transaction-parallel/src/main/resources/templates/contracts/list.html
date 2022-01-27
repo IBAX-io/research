@@ -27,7 +27,7 @@
 				<tbody th:each="mapEntry: ${maps}">
 					<tr>
 						<td th:text="${mapEntry.key}"></td>
-						<td th:each="contracts: ${mapEntry.value}"><label th:text="${contracts.getName()}"></label></td>
+						<td><div th:each="contracts: ${mapEntry.value}" th:text="${contracts.getName()}"></div></td>
 					</tr>
 					
 				</tbody>

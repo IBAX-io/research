@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>contractsRelation</title>
+		
+		<style type="text/css">
+			
+			table,table tr th, table tr td { border:1px solid #0094ff; }
+		</style>
+	</head>
+
+	<body>
+		<div class="container-fluid">
+			<table class="" >
+				<thead>
+					<tr>
+						<th>seq</th>
+						<th>contracts_name</th>
+						<th>contracts_relation</th>
+						<th>funcName</th>
+						<th>optResource</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="contractsRelation,contractsRelationStat:${contractsRelationList}">
+						<td th:text="${contractsRelationStat.index+1}"></td>
+						<td th:text="${contractsRelation.getContractsName()}"></td>
+						<td><div th:each="contractName: ${contractsRelation.getContracts()}" th:text="${contractName}"></div></td>
+						<td><div th:each="funcName: ${contractsRelation.getFunc()}" th:text="${funcName}"></div></td>
+						<td><div th:each="optResource: ${contractsRelation.getOptResource()}" th:text="${optResource}"></div></td>
+					</tr>
+					
+				</tbody>
+			</table>
+		</div>
+
+	</body>
+
+</html>

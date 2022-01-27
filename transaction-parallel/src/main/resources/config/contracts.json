@@ -142,6 +142,7 @@
 		"RegexpMatch",
 		"DBCount",
 		"MathMod",
-		"CreateView"
+		"CreateView",
+		"DBFind"
 	]
 }
