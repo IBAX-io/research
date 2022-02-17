@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import io.ibax.data.Account;
 import io.ibax.data.Block;
@@ -19,6 +20,7 @@ import io.ibax.mapper.OutputMapper;
 import io.ibax.mapper.TransactionMapper;
 
 @SpringBootApplication
+@EnableScheduling
 public class AccountModelApplication {
 
 	public static void main(String[] args) {
@@ -34,7 +36,7 @@ public class AccountModelApplication {
 //		};
 //	}
 
-	@Bean
+//	@Bean
 	ApplicationRunner GenesisBlock(AccountMapper accountMapper, //
 			OutputMapper outputMapper, //
 			BlockMapper blockMapper, //

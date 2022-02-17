@@ -22,4 +22,10 @@ public interface OutputMapper {
 
 	@Select("SELECT count(*) FROM t_output ")
 	int countAll();
+	
+	@Select("SELECT o.account,SUM(amount) amount FROM t_output AS o GROUP BY o.account ORDER BY amount DESC LIMIT 1 ")
+	Output getMaxOutput();
+	
+	@Select("SELECT o.account,SUM(amount) amount FROM t_output AS o GROUP BY o.account ORDER BY amount ASC LIMIT 1 ")
+	Output getMinOutput();
 }
