@@ -43,7 +43,7 @@ public class TransactionGroupDemo {
 							if((System.currentTimeMillis() - start)<=2000) {
 								TimeUnit.MILLISECONDS.sleep(10);
 								collectData.add(tx);
-								
+								log.info("transaction group {}, transaction address: {}",key , tx);
 							}else {
 								break;
 							}

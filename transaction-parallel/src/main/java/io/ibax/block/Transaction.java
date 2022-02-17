@@ -1,9 +1,22 @@
 package io.ibax.block;
 
+import java.util.List;
+
 public class Transaction {
 	private int from;
 
 	private int to;
+	
+	private List<String> tables;
+	
+	public Transaction() {}
+
+	public Transaction(int from, int to, List<String> tables) {
+		super();
+		this.from = from;
+		this.to = to;
+		this.tables = tables;
+	}
 
 	public int getFrom() {
 		return from;
@@ -26,10 +39,17 @@ public class Transaction {
 		this.to = to;
 	}
 
+	public List<String> getTables() {
+		return tables;
+	}
+
+	public void setTables(List<String> tables) {
+		this.tables = tables;
+	}
+
 	@Override
 	public String toString() {
-		return "Transaction [from=" + from + ", to=" + to + "]";
+		return "Transaction [from=" + from + ", to=" + to + ", tables=" + tables + "]";
 	}
-	
 
 }
