@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 public class ContractResIsolate {
 	private static final Logger log = LoggerFactory.getLogger(ContractResIsolate.class);
@@ -74,16 +75,23 @@ public class ContractResIsolate {
 			excuGroupMap.forEach((key,value)->{
 				size[0] = size[0]+value.size();
 			});
+			long start = System.currentTimeMillis();
 			CountDownLatch countDownLatch = new CountDownLatch(size[0]);
 			
 			excuGroupMap.forEach((key,value)->{
 				threadPool.execute(()->{
 					for (Transaction tx : value) { 
 						try {
-							TimeUnit.MILLISECONDS.sleep(10);
-							collectData.add(tx);
-							log.info("transaction group {}, transaction address: {}",key , tx);
-							countDownLatch.countDown();
+							if((System.currentTimeMillis() - start)<=2000) {
+								TimeUnit.MILLISECONDS.sleep(10);
+								collectData.add(tx);
+								log.info("transaction group {}, transaction address: {}",key , tx);
+								countDownLatch.countDown();
+							
+							 }else { 
+								break; 
+							 }
+							
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -119,9 +127,8 @@ public class ContractResIsolate {
 			Transaction tx0 = txs.get(0);
 			Set<String> tableSet = new HashSet<String>();
 			tableSet.addAll(tx0.getTables());
-
+			
 			List<Transaction> txadd = new ArrayList<Transaction>();
-
 			Iterator<Transaction> iterator = txs.iterator();
 			while (iterator.hasNext()) {
 				Transaction tx = iterator.next();
@@ -182,40 +189,44 @@ public class ContractResIsolate {
 						iterator.remove();
 						
 						if(txs.isEmpty()) {
-							Transaction vertex = txadd.get(0);
 							
-							Set<String> set = new HashSet<String>();
-							set.add(vertex.getFrom()+"");
-							set.add(vertex.getTo()+"");
-							set.addAll(vertex.getTables());
-							
-							List<Transaction> tempTxadd = new ArrayList<Transaction>();
-							Iterator<Transaction> iterator1 = txadd.iterator();
-							while (iterator1.hasNext()) {
-								Transaction tx1 = iterator1.next();
-								if(set.contains(tx1.getFrom()+"")||set.contains(tx1.getTo()+"")) {
-									set.add(tx1.getFrom()+"");
-									set.add(tx1.getTo()+"");
-									set.addAll(tx1.getTables());
-									tempTxadd.add(tx1);
-									iterator1.remove();
-								}else {
-									for(String value : tx1.getTables()) {
-										if(set.contains(value)) {
-											set.add(tx1.getFrom()+"");
-											set.add(tx1.getTo()+"");
-											set.addAll(tx1.getTables());
-											
-											tempTxadd.add(tx1);
-											iterator1.remove();
-											break;
+							while(!txadd.isEmpty()) {
+								Transaction vertex = txadd.get(0);
+								
+								Set<String> set = new HashSet<String>();
+								set.add(vertex.getFrom()+"");
+								set.add(vertex.getTo()+"");
+								set.addAll(vertex.getTables());
+								
+								List<Transaction> tempTxadd = new ArrayList<Transaction>();
+								Iterator<Transaction> iterator1 = txadd.iterator();
+								while (iterator1.hasNext()) {
+									Transaction tx1 = iterator1.next();
+									if(set.contains(tx1.getFrom()+"")||set.contains(tx1.getTo()+"")) {
+										set.add(tx1.getFrom()+"");
+										set.add(tx1.getTo()+"");
+										set.addAll(tx1.getTables());
+										tempTxadd.add(tx1);
+										iterator1.remove();
+									}else {
+										for(String value : tx1.getTables()) {
+											if(set.contains(value)) {
+												set.add(tx1.getFrom()+"");
+												set.add(tx1.getTo()+"");
+												set.addAll(tx1.getTables());
+												
+												tempTxadd.add(tx1);
+												iterator1.remove();
+												break;
+											}
 										}
+										
 									}
-									
 								}
+								groupMap.put(group, tempTxadd);
+								group++;
+								
 							}
-							groupMap.put(group, tempTxadd);
-							group++;
 						}
 					}
 				}
@@ -233,6 +244,12 @@ public class ContractResIsolate {
 	 */
 	private static List<Transaction> initData() {
 		List<Transaction> txs = new ArrayList<Transaction>();
+		{
+			List<String> tables = new ArrayList<String>();
+			Transaction tx = new Transaction(8, 9, tables);
+			
+			txs.add(tx);
+		}
 		{
 			List<String> tables = new ArrayList<String>();
 			tables.add("1_bad_blocks");
@@ -317,6 +334,12 @@ public class ContractResIsolate {
 			tables.add("1_bad_blocks");
 			tables.add("2_app_params");
 			Transaction tx = new Transaction(2, 3, tables);
+			
+			txs.add(tx);
+		}
+		{
+			List<String> tables = new ArrayList<String>();
+			Transaction tx = new Transaction(10, 11, tables);
 			
 			txs.add(tx);
 		}
