@@ -1,8 +1,8 @@
 package io.ibax;
 
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import io.ibax.data.Account;
 import io.ibax.data.Block;
 import io.ibax.data.Output;
 import io.ibax.data.Transaction;
@@ -43,47 +42,49 @@ public class AccountModelApplication {
 			TransactionMapper transactionMapper) {
 		return args -> {
 
-			String account = UUID.randomUUID().toString();
+//			String account = UUID.randomUUID().toString();
 //			String account = "0"; 
+//			account="234e1345-2b92-454e-ac08-9ab95215d3cf";
+			String account = "1111-1111-1111-1111-1111";
+
 			{
 				accountMapper.deleteAll();
 				// Account
 				System.out.println("account\t" + account);
-				accountMapper.insert(new Account(0, account, false));
+				accountMapper.insert(account);
 			}
 
 			Integer height = 0;
-			BigInteger amount = new BigInteger("100000000");
-			String hashUTXO = null;
-			{
-				outputMapper.deleteAll();
-				// Output
-				Long timestamp = new Date().getTime();
-				Boolean targetable = true;
-				Output output = new Output(height, account, amount, timestamp, targetable);
-				outputMapper.insert(output);
-				hashUTXO = output.getHash();
-			}
+			Long amount = 100_000_000_000_000L;
 
-			String hashTx = null;
+			String txhash = null;
+			Long timestamp = new Date().getTime();
 			{
-				transactionMapper.deleteAll();
+
 				// Transaction
+				transactionMapper.deleteAll();
+
 				String from = "0000-0000-0000-0000-0000";
 				String to = account;
-				Long timestamp = new Date().getTime();
-				String input = hashUTXO;
-				String output = hashUTXO;
-				Transaction transaction = new Transaction(from, to, amount, timestamp, input, output, height);
+				String inputHash = "0000000000000000000000000000000000000000000000000000000000000000";
+
+				Transaction transaction = new Transaction(from, to, amount, timestamp, inputHash, height);
 				transactionMapper.insert(transaction);
-				hashTx = transaction.getHash();
+				txhash = transaction.getHash();
+
+				// Output
+				outputMapper.deleteAll();
+				Boolean targetable = true;
+				Output output = new Output(height, account, amount, timestamp, targetable, 0, txhash);
+				outputMapper.insert(output);
 			}
 			{
 				blockMapper.deleteAll();
 				// Block
 				String parent = "0000000000000000000000000000000000000000000000000000000000000000";
-				Long timestamp = new Date().getTime();
-				blockMapper.insert(new Block(parent, height, timestamp, hashTx));
+				List<String> txhash2 = new ArrayList<String>();
+				txhash2.add(txhash);
+				blockMapper.insert(new Block(parent, height, timestamp, txhash2));
 			}
 
 		};

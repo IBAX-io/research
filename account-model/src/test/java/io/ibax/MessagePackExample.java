@@ -1,12 +1,24 @@
 package io.ibax;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.msgpack.core.MessageBufferPacker;
+import org.msgpack.core.MessageFormat;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessagePack.PackerConfig;
 import org.msgpack.core.MessagePack.UnpackerConfig;
-import org.msgpack.core.MessageBufferPacker;
-import org.msgpack.core.MessageFormat;
 import org.msgpack.core.MessagePacker;
 import org.msgpack.core.MessageUnpacker;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.msgpack.value.ArrayValue;
 import org.msgpack.value.ExtensionValue;
 import org.msgpack.value.FloatValue;
@@ -14,12 +26,9 @@ import org.msgpack.value.IntegerValue;
 import org.msgpack.value.TimestampValue;
 import org.msgpack.value.Value;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.time.Instant;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 /**
  * This class describes the usage of MessagePack
@@ -232,14 +241,84 @@ public class MessagePackExample {
 		unpacker.close();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		MessageBufferPacker msgpack = MessagePack.newDefaultBufferPacker();
 //		msgpack.
 
-//		Map<String, Object> body = Maps.newHashMap();
+		Map<String, Object> body = Maps.newHashMap();
 
 //		byte[] data = msgpack.write(body);
 //		byte[] hash = getSHA(data, "SHA-256");
+//		MessagePack messagePack=new MessagePack()
 
+// link:		https://github.com/msgpack/msgpack-java/tree/develop/msgpack-jackson
+//		Basic usage
+		{
+//		Serialization/Deserialization of POJO
+			// Instantiate ObjectMapper for MessagePack
+			ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
+
+			// Serialize a Java object to byte array
+			ExamplePojo pojo = new ExamplePojo("komamitsu");
+			byte[] bytes = objectMapper.writeValueAsBytes(pojo);
+
+			// Deserialize the byte array to a Java object
+			ExamplePojo deserialized = objectMapper.readValue(bytes, ExamplePojo.class);
+			System.out.println(deserialized.getName()); // => komamitsu
+		}
+		{
+//		Serialization/Deserialization of List
+
+			// Instantiate ObjectMapper for MessagePack
+			ObjectMapper objectMapper = new MessagePackMapper();
+
+			// Serialize a List to byte array
+			List<Object> list = new ArrayList<>();
+			list.add("Foo");
+			list.add("Bar");
+			list.add(42);
+			byte[] bytes = objectMapper.writeValueAsBytes(list);
+
+			// Deserialize the byte array to a List
+			List<Object> deserialized = objectMapper.readValue(bytes, new TypeReference<List<Object>>() {
+			});
+			System.out.println(deserialized); // => [Foo, Bar, 42]
+		}
+		{
+//		Serialization/Deserialization of Map
+			// Instantiate ObjectMapper for MessagePack
+			ObjectMapper objectMapper = new MessagePackMapper();
+
+			// Serialize a Map to byte array
+			Map<String, Object> map = new HashMap<>();
+			map.put("name", "komamitsu");
+			map.put("age", 42);
+			byte[] bytes = objectMapper.writeValueAsBytes(map);
+			{
+				// Deserialize the byte array to a Map
+				Map<String, Object> deserialized = objectMapper.readValue(bytes, new TypeReference<Map<String, Object>>() {
+				});
+				System.out.println(deserialized); // => {name=komamitsu, age=42}
+
+			}
+			{
+				ExamplePojo deserialized = objectMapper.readValue(bytes, ExamplePojo.class);
+				System.out.println(deserialized);// => {name=komamitsu, age=42}
+			}
+
+		}
+		{
+//		Example of Serialization/Deserialization over multiple languages
+
+//		Java
+			ObjectMapper objectMapper = new MessagePackMapper();
+			// Serialize
+			Map<String, Object> obj = new HashMap<String, Object>();
+			obj.put("foo", "hello");
+			obj.put("bar", "world");
+			byte[] bs = objectMapper.writeValueAsBytes(obj);
+			// bs => [-126, -93, 102, 111, 111, -91, 104, 101, 108, 108, 111,
+			// -93, 98, 97, 114, -91, 119, 111, 114, 108, 100]
+		}
 	}
 }

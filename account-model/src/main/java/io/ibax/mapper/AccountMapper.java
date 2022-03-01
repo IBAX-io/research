@@ -13,8 +13,12 @@ import io.ibax.data.Account;
 public interface AccountMapper {
 
 	@Insert("INSERT INTO t_account (id,account,locked) VALUES(#{id},#{account},#{locked}) ")
-	void insert(Account account);
+	void insertAccount(Account account);
 
+	@Insert("INSERT INTO t_account (account) VALUES(#{account}) ")
+	void insert(String account);
+
+	
 	@Delete("DELETE FROM t_account ")
 	void deleteAll();
 
@@ -23,4 +27,7 @@ public interface AccountMapper {
 
 	@Select("SELECT count(*) FROM t_account ")
 	int countAll();
+
+	@Select("SELECT id,account,locked FROM t_account WHERE account = #{account} ")
+	Account getByAccount(String account);
 }

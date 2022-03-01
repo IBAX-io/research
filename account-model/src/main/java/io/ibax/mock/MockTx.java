@@ -1,7 +1,6 @@
 package io.ibax.mock;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -62,11 +61,11 @@ public class MockTx {
 			Output maxOutput = outputMapper.getMaxOutput();
 			if (maxOutput != null) {
 				String from = maxOutput.getAccount();
-				BigInteger amount = maxOutput.getAmount();
+//				Long amount = maxOutput.getAmount();
 
 				int accountNum = accountMapper.countAll();
 				String to = null;
-				if (accountNum < 10000) {
+				if (accountNum < 10) {
 					to = UUID.randomUUID().toString();
 				} else {
 					Output minOutput = outputMapper.getMinOutput();
@@ -78,7 +77,7 @@ public class MockTx {
 				packer.packString("Transfer");
 				packer.packString(from)//
 						.packString(to)//
-						.packLong(random.nextInt(amount.intValue()))//
+						.packLong(random.nextLong(maxOutput.getAmount()))//
 						.packLong(new Date().getTime());
 				packer.close();
 				String tx = Hex.encodeHexString(packer.toByteArray());

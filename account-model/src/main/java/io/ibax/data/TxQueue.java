@@ -13,43 +13,50 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Output {
+public class TxQueue {
 
-	private String hash; // TODO byte[] hash
+	private String hash;
+
 	private byte[] data;
 	// data extra
-	private Integer height;
+	private String contract;
+	private String from; // from account
+	private String to; // to account
 	private Long amount;
-	private String account;
 	private Long timestamp;
-	private Boolean targetable; // TODO Transaction channel
-	private Integer index;
-	private String txhash;
-	
-	public Output(Integer height, String account, Long amount,Long timestamp, Boolean targetable,Integer index,String txhash) {
 
+//	public TxPool() {
+//
+//	}
+
+	public TxQueue(String contract, String from, String to, Long amount, Long timestamp) {
 		try {
 			MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
-			packer.packInt(height)//
-					.packString(account)//
+			packer.packString(contract)//
+					.packString(from)//
+					.packString(to)//
 					.packLong(amount)//
-					.packLong(timestamp)//
-					.packBoolean(targetable)//
-					.packInt(index);
+					.packLong(timestamp);
 			packer.close();
 			this.data = packer.toByteArray();
 			this.hash = Hash256Util.hash256(this.data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		this.height = height;
-		this.account = account;
+		this.contract = contract;
+		this.from = from;
+		this.to = to;
 		this.amount = amount;
 		this.timestamp = timestamp;
-		this.targetable = targetable;
-		this.index = index;
-		this.txhash = txhash;
+	}
+
+	public TxQueue(String hash, String contract, String from, String to, Long amount, Long timestamp) {
+		this.hash = hash;
+		this.contract = contract;
+		this.from = from;
+		this.to = to;
+		this.amount = amount;
+		this.timestamp = timestamp;
 	}
 
 }
