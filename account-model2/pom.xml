@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>io.ibax</groupId>
-	<artifactId>account-model</artifactId>
+	<artifactId>account-model2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
