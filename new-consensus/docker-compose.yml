@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  new-consensus:
+    env_file:
+      - .env
+    restart: always
+    image: akibax/new-consensus:latest
+    container_name: new-consensus
+    ports:
+      - "8081:8081"
+      - "3001:3001"
+    command: --spring.profiles.active=node21  
+    environment:
+      - SPRING_PROFILES_ACTIVE=node21  
+    depends_on:
+      - consensus-postgresql
+    links:
+      - consensus-postgresql:consensus-postgresql
+  consensus-postgresql:
+    restart: always
+    image: postgres:latest
+    container_name: consensus-postgresql
+    command: postgres -c 'max_connections=200'
+    privileged: true
+    ports:
+      - "5555:5432"
+    environment:
+      TZ: UTC
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+volumes:
+  postgresql-data:
+

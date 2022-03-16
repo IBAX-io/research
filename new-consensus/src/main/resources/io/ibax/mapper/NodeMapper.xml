@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.ibax.mapper.NodeMapper">
+	<resultMap type="Node" id="NodesResultMap">
+		<result property="id" column="id" />
+		<result property="ip" column="ip" />
+		<result property="port" column="port" />
+		<result property="activeStatus" column="active_status" />
+		<result property="nodeStatus" column="node_status" />
+	</resultMap>
+	
+	<update id="monitorUpateNote" parameterType="Node">
+		update server set active_status=#{activeStatus} where ip=#{ip} and port=#{port}
+	</update>
+	
+	<select id="getNodes" resultMap="NodesResultMap">
+		SELECT id, ip, port, active_status, node_status FROM server order by id asc
+	</select>
+	
+	<update id="updateNoteByFollower" parameterType="Node">
+		update server set node_status=#{nodeStatus} where id=#{id}
+	</update>
+	
+	<update id="updateNextPackageNode" parameterType="Node">
+		update server set node_status=#{nodeStatus} where ip=#{ip} and port=#{port}
+	</update>
+	
+	<select id="findById" resultMap="NodesResultMap" parameterType="Integer">
+		SELECT id, ip, port, active_status, node_status FROM server where id=#{id}
+	</select>
+
+</mapper>
