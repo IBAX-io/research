@@ -10,14 +10,22 @@
 		<result property="port" column="port" />
 		<result property="activeStatus" column="active_status" />
 		<result property="nodeStatus" column="node_status" />
+		<result property="delay" column="delay"/>
+		<result property="latestTimeOfReceivedPacket" column="latest_time_received"/>
+		<result property="latestTimeOfSentPacket" column="latest_time_sent"/>
+		<result property="timeFirstConnected" column="time_first_connected"/>
+		<result property="timeClosed" column="time_closed"/>
+		<result property="sentBytes" column="sent_bytes"/>
+		<result property="receivedBytes" column="received_bytes"/>
 	</resultMap>
 	
 	<update id="monitorUpateNote" parameterType="Node">
-		update server set active_status=#{activeStatus} where ip=#{ip} and port=#{port}
+		update server set active_status=#{activeStatus}, delay=#{delay}, latest_time_received=#{latestTimeOfReceivedPacket}, latest_time_sent=#{latestTimeOfSentPacket},
+		time_first_connected=#{timeFirstConnected}, time_closed=#{timeClosed}, sent_bytes=#{sentBytes}, received_bytes=#{receivedBytes} where ip=#{ip} and port=#{port}
 	</update>
 	
 	<select id="getNodes" resultMap="NodesResultMap">
-		SELECT id, ip, port, active_status, node_status FROM server order by id asc
+		SELECT id, ip, port, active_status, node_status,delay, latest_time_received, latest_time_sent, time_first_connected, time_closed, sent_bytes, received_bytes FROM server order by id asc
 	</select>
 	
 	<update id="updateNoteByFollower" parameterType="Node">
@@ -31,5 +39,16 @@
 	<select id="findById" resultMap="NodesResultMap" parameterType="Integer">
 		SELECT id, ip, port, active_status, node_status FROM server where id=#{id}
 	</select>
-
+	
+	<select id="findByIp" resultMap="NodesResultMap" parameterType="String">
+		SELECT id, ip, port, active_status, node_status FROM server where ip=#{ip}
+	</select>
+	
+	<insert id="batchInsert" parameterType="java.util.List">
+		
+	</insert>
+	
+	<insert id="insertNode" parameterType="Node">
+		insert into server(ip, port) values (#{ip}, #{port})
+	</insert>
 </mapper>

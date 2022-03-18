@@ -11,8 +11,11 @@ import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 import org.tio.client.intf.TioClientHandler;
+import org.tio.core.Tio;
 
+import io.ibax.mapper.CandidateNodeMapper;
 import io.ibax.mapper.NodeMapper;
+import io.ibax.model.CandidateNode;
 import io.ibax.model.Node;
 import io.ibax.net.conf.TioProps;
 
@@ -40,19 +43,33 @@ public class HelloClientStarter{
 	private TioProps properties;
 	@Autowired
 	private NodeMapper nodeMapper;
+	@Autowired
+	private CandidateNodeMapper candidateNodeMapper;
 	
 	public void clientStart() {
 		try {
 			clientTioConfig.setHeartbeatTimeout(properties.getHeartTimeout());
 			tioClient = new TioClient(clientTioConfig);
-			List<Node> nodes = nodeMapper.getNodes();
-			for(Node node : nodes) {
-				 clientChannelContext = tioClient.connect(node);
+			
+			List<CandidateNode> candidateNodes = candidateNodeMapper.getCandidateNodes();
+			for (CandidateNode candidateNode : candidateNodes) {
+				Node node = new Node();
+				node.setIp(candidateNode.getIp());
+				node.setPort(candidateNode.getPort());
+				clientChannelContext = tioClient.connect(node);
+				Tio.bindGroup(clientChannelContext, properties.getClientGroupName());
+				
+				if(!clientChannelContext.isClosed) {
+					Node localNode = nodeMapper.findByIp(candidateNode.getIp());
+					if(null == localNode) {
+						nodeMapper.insertNode(node);
+					}
+				}
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	public static TioClientConfig getClientTioConfig() {

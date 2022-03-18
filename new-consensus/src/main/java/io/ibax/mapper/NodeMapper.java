@@ -3,6 +3,7 @@ package io.ibax.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import io.ibax.model.Node;
 
@@ -43,4 +44,10 @@ public interface NodeMapper {
 	 * @return
 	 */
 	public Node findById(int id);
+	
+	public Node findByIp(String ip);
+	
+	public void batchInsert(@Param("nodes") List<Node> nodes);
+	
+	public void insertNode(Node node);
 }
