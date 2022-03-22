@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import io.ibax.mapper.NodeMapper;
 import io.ibax.model.Node;
+import io.ibax.net.base.ActiveStatus;
 import io.ibax.net.base.HelloPacket;
 import io.ibax.net.base.NodeStatus;
 import io.ibax.net.client.HelloClientStarter;
@@ -92,7 +93,7 @@ public class BlockGeneration {
 		if(null != nodes || nodes.size() > 0) {
 			int currentIndex = nodes.indexOf(node);
 			if(currentIndex == nodes.size()) {
-				 return nodes.get(0) ;
+				return nodes.get(0);
 			}
 			return nodes.get(currentIndex+1);
 		}

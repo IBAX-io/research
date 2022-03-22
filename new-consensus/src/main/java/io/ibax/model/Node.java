@@ -16,7 +16,7 @@ public class Node extends org.tio.core.Node implements Serializable {
 	private int id;
 	private int activeStatus; // 0:offline 1:online
 	private int nodeStatus; // FOLLOWER(0), CANDIDATE(1), LEADER(2);
-	private String delay;
+	private float delay;
 	private Node self;
 	private long latestTimeOfReceivedPacket; 
 	private long latestTimeOfSentPacket; 
@@ -65,11 +65,11 @@ public class Node extends org.tio.core.Node implements Serializable {
 		this.self = self;
 	}
 
-	public String getDelay() {
+	public float getDelay() {
 		return delay;
 	}
 
-	public void setDelay(String delay) {
+	public void setDelay(float delay) {
 		this.delay = delay;
 	}
 

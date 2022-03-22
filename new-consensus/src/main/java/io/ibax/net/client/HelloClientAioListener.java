@@ -18,12 +18,11 @@ public class HelloClientAioListener implements TioClientListener{
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 			throws Exception {
-		logger.info("HelloClientAioListener -> onAfterConnected:{},{},{}",channelContext, isConnected, isReconnect);
 		if (isConnected) {
             logger.info("connection succeeded：server ip:{}", channelContext.getServerNode());
             Tio.bindGroup(channelContext, "blockchain-client");
         } else {
-            logger.info("Connection failed：server ip:{}" + channelContext.getServerNode());
+            logger.info("Connection failed：server ip:{}" , channelContext.getServerNode());
         }
 		
 	}

@@ -1,6 +1,7 @@
 package io.ibax.mapper;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,7 +25,7 @@ public interface NodeMapper {
 	 * Get packaging nodes on all chains
 	 * @return
 	 */
-	public List<Node> getNodes();
+	public Vector<Node> getNodes();
 	
 	/**
 	 * After the block is generated, update itself to FOLLOWER

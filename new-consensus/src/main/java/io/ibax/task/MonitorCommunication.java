@@ -2,6 +2,7 @@ package io.ibax.task;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -13,10 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ReconnConf;
-import org.tio.client.TioClient;
-import org.tio.client.TioClientConfig;
-import org.tio.client.intf.TioClientHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.stat.ChannelStat;
 import org.tio.utils.lock.SetWithLock;
@@ -24,10 +21,7 @@ import org.tio.utils.lock.SetWithLock;
 import io.ibax.mapper.NodeMapper;
 import io.ibax.model.Node;
 import io.ibax.net.base.ActiveStatus;
-import io.ibax.net.client.HelloClientAioHandler;
-import io.ibax.net.client.HelloClientAioListener;
 import io.ibax.net.client.HelloClientStarter;
-import io.ibax.net.conf.TioProps;
 
 /**
  * Monitor whether the network of all packaging nodes is smooth
@@ -38,32 +32,19 @@ import io.ibax.net.conf.TioProps;
 public class MonitorCommunication {
 	private static Logger log = LoggerFactory.getLogger(MonitorCommunication.class);
 	
-	private static String networkDelay = "";
-	
-	private static List<Node> nodes = null;
-	
-	private static TioClient tioClient = null;
+	private static float networkDelay = -1;
 	
 	private static Runtime runtime = Runtime.getRuntime();
-	
-	private static ClientChannelContext clientChannelContext = null;
-	
-	private static TioClientHandler tioClientHandler = new HelloClientAioHandler();
-	private static HelloClientAioListener aioListener = new HelloClientAioListener();
-	private static ReconnConf reconnConf = new ReconnConf(5000L);
-	private static TioClientConfig clientTioConfig = new TioClientConfig(tioClientHandler, aioListener, reconnConf);
-	
-	@Autowired
-	private TioProps properties;
+
 	@Autowired
 	private NodeMapper nodeMapper;
 	
 	@Scheduled(fixedRate = 2000)
 	public void monitorNodes(){
-		log.info("Monitor all packaging nodes");
-		//nodes = nodeMapper.getNodes(); //Check if a new node has joined
+		log.info("Monitor all packaging nodes......");
 		
 		SetWithLock<ChannelContext> setWithLock = HelloClientStarter.getClientTioConfig().connections;
+		log.info("Monitor add nodes connections:{}",setWithLock.size());
 		
 		ReadLock readLock = setWithLock.readLock();
 		readLock.lock();
@@ -78,7 +59,7 @@ public class MonitorCommunication {
 					if(null != stat) {
 						node.setLatestTimeOfReceivedPacket(stat.getLatestTimeOfReceivedPacket());
 						node.setLatestTimeOfSentPacket(stat.getLatestTimeOfSentPacket());
-						node.setTimeFirstConnected(stat.getTimeFirstConnected());
+						node.setTimeFirstConnected(stat.getTimeFirstConnected()==null?-1:stat.getTimeFirstConnected());
 						node.setTimeClosed(stat.getTimeClosed());
 						node.setSentBytes(stat.getSentBytes().get());
 						node.setReceivedBytes(stat.getReceivedBytes().get());
@@ -95,17 +76,18 @@ public class MonitorCommunication {
 						runSystemCommand("ping -c 3 " + node.getIp(), osName);
 					}
 					
-					node.setDelay(networkDelay);
-					node.setActiveStatus(ActiveStatus.ACTIVITY);
-					node.setActiveStatus(ActiveStatus.DIE);
+					if(!"".equals(networkDelay)) {
+						node.setDelay(networkDelay);
+					}
 					if(null != stat) {
 						node.setLatestTimeOfReceivedPacket(stat.getLatestTimeOfReceivedPacket());
 						node.setLatestTimeOfSentPacket(stat.getLatestTimeOfSentPacket());
-						node.setTimeFirstConnected(stat.getTimeFirstConnected());
+						node.setTimeFirstConnected(stat.getTimeFirstConnected()==null?-1:stat.getTimeFirstConnected());
 						node.setTimeClosed(stat.getTimeClosed());
 						node.setSentBytes(stat.getSentBytes().get());
 						node.setReceivedBytes(stat.getReceivedBytes().get());
 					}
+					node.setActiveStatus(ActiveStatus.ACTIVITY);
 					
 					nodeMapper.monitorUpateNote(node);
 				}
@@ -128,17 +110,30 @@ public class MonitorCommunication {
             if(osName.toLowerCase().contains("window")) {
             	while ((s = inputStream.readLine()) != null) {
                     sb.append(s);
-                    log.info(s);
                 }
-            	int  index= sb.indexOf("平均");
-                networkDelay = sb.substring(index+5,sb.length());
+            	if(sb.lastIndexOf("=") > 0) {
+                    networkDelay = Float.valueOf(sb.substring(sb.lastIndexOf("=") + 2,sb.length()).replace("ms", ""));
+            	}
                 
     		}else if(osName.toLowerCase().contains("linux")) {
+    			List<Float> speed = new ArrayList<Float>();
+    			
     			while ((s = inputStream.readLine()) != null) {
+    				log.info("linux ping: {}",s);
     				 s = s.substring(s.indexOf("time="),s.length());
-    				 sb.append(s).append("/");
+    				 if(s.indexOf("time=") > 0) {
+    					s = s.substring(s.indexOf("time=")+5,s.length()).replace(" ms", "");
+    	    			speed.add(Float.valueOf(s));
+    				 }
                 }
-    			networkDelay = sb.toString();
+    			float sum = 0f;
+    			for (Float float1 : speed) {
+    				sum = sum +float1;
+    			}
+    			if(speed.size() > 0) {
+    				networkDelay = Math.round(sum/speed.size());
+    			}
+    			
     		}else {
     			log.info("The current system is not currently supported");
     		}

@@ -20,12 +20,41 @@
 	</resultMap>
 	
 	<update id="monitorUpateNote" parameterType="Node">
-		update server set active_status=#{activeStatus}, delay=#{delay}, latest_time_received=#{latestTimeOfReceivedPacket}, latest_time_sent=#{latestTimeOfSentPacket},
-		time_first_connected=#{timeFirstConnected}, time_closed=#{timeClosed}, sent_bytes=#{sentBytes}, received_bytes=#{receivedBytes} where ip=#{ip} and port=#{port}
+		update server set 
+			active_status=#{activeStatus}, 
+		<if test="delay != null and delay != ''">
+			delay=#{delay},
+		</if>
+			latest_time_received=#{latestTimeOfReceivedPacket}, 
+			latest_time_sent=#{latestTimeOfSentPacket},
+			time_first_connected=#{timeFirstConnected}, 
+			time_closed=#{timeClosed}, 
+			sent_bytes=#{sentBytes}, 
+			received_bytes=#{receivedBytes} 
+		where ip=#{ip} and port=#{port}
 	</update>
 	
 	<select id="getNodes" resultMap="NodesResultMap">
-		SELECT id, ip, port, active_status, node_status,delay, latest_time_received, latest_time_sent, time_first_connected, time_closed, sent_bytes, received_bytes FROM server order by id asc
+		select
+			id,
+			ip,
+			port,
+			active_status,
+			node_status,
+			delay,
+			latest_time_received,
+			latest_time_sent,
+			time_first_connected,
+			time_closed,
+			sent_bytes,
+			received_bytes
+		from
+			server
+		where
+			active_status = 1
+		order by
+			delay asc
+		limit 101
 	</select>
 	
 	<update id="updateNoteByFollower" parameterType="Node">
@@ -49,6 +78,6 @@
 	</insert>
 	
 	<insert id="insertNode" parameterType="Node">
-		insert into server(ip, port) values (#{ip}, #{port})
+		INSERT INTO server (ip,port) VALUES(#{ip}, #{port}) ON CONFLICT (ip) DO NOTHING
 	</insert>
 </mapper>

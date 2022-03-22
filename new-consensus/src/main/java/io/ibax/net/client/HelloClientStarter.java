@@ -1,6 +1,11 @@
 package io.ibax.net.client;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,23 +53,39 @@ public class HelloClientStarter{
 	
 	public void clientStart() {
 		try {
+			int cpus = Runtime.getRuntime().availableProcessors();
+			ExecutorService threadPool = new ThreadPoolExecutor(10, cpus*2, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(10000), Executors.defaultThreadFactory(),
+					new ThreadPoolExecutor.DiscardPolicy());
+			
 			clientTioConfig.setHeartbeatTimeout(properties.getHeartTimeout());
 			tioClient = new TioClient(clientTioConfig);
 			
 			List<CandidateNode> candidateNodes = candidateNodeMapper.getCandidateNodes();
+			long start = System.currentTimeMillis();
 			for (CandidateNode candidateNode : candidateNodes) {
-				Node node = new Node();
-				node.setIp(candidateNode.getIp());
-				node.setPort(candidateNode.getPort());
-				clientChannelContext = tioClient.connect(node);
-				Tio.bindGroup(clientChannelContext, properties.getClientGroupName());
-				
-				if(!clientChannelContext.isClosed) {
-					Node localNode = nodeMapper.findByIp(candidateNode.getIp());
-					if(null == localNode) {
-						nodeMapper.insertNode(node);
-					}
+				if ((System.currentTimeMillis() - start) <= 2000) {
+					threadPool.execute(() -> {
+						Node node = new Node();
+						node.setIp(candidateNode.getIp());
+						node.setPort(candidateNode.getPort());
+						try {
+							clientChannelContext = tioClient.connect(node);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						if(null != clientChannelContext) {
+							if(!clientChannelContext.isClosed) {
+								//Tio.bindGroup(clientChannelContext, properties.getClientGroupName());
+								
+								Node localNode = nodeMapper.findByIp(candidateNode.getIp());
+								if(null == localNode) {
+									nodeMapper.insertNode(node);
+								}
+							}
+						}
+					});
 				}
+				
 			}
 			
 		} catch (Exception e) {
