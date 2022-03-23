@@ -51,7 +51,7 @@
 		from
 			server
 		where
-			active_status = 1
+			active_status = 1 and delay > -1
 		order by
 			delay asc
 		limit 101

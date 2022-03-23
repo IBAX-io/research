@@ -15,6 +15,7 @@ import org.tio.utils.lock.SetWithLock;
 
 import io.ibax.mapper.NodeMapper;
 import io.ibax.model.Node;
+import io.ibax.net.ApplicationContextProvider;
 import io.ibax.net.client.HelloClientStarter;
 
 @Component
@@ -23,15 +24,15 @@ public class VarietyHonorNode {
 	
 	private Vector<Node> honorNodes = null;
 	
-	@Autowired
-	private NodeMapper nodeMapper;
+//	@Autowired
+//	private NodeMapper nodeMapper;
 	
-	@Scheduled(fixedRate = 1000 * 2)
+	@Scheduled(fixedRate = 1000 * 10)
 	public void honorNode() {
 		SetWithLock<ChannelContext> setWithLock = HelloClientStarter.getClientTioConfig().connections;
 		ReadLock readLock = setWithLock.readLock();
 		readLock.lock();
-
+		NodeMapper nodeMapper = ApplicationContextProvider.getApplicationContext().getBean(NodeMapper.class);
 		honorNodes = nodeMapper.getNodes(); //Check if a new node has joined
 		Vector<Node> newAddHonorNodes = new Vector<Node>();
 		try {

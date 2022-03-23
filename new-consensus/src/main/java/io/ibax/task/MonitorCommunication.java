@@ -73,7 +73,7 @@ public class MonitorCommunication {
 					if(osName.toLowerCase().contains("window")) {
 						runSystemCommand("ping " + node.getIp(), osName);
 					}else if(osName.toLowerCase().contains("linux")){
-						runSystemCommand("ping -c 3 " + node.getIp(), osName);
+						runSystemCommand("ping -c 1 " + node.getIp(), osName);
 					}
 					
 					if(!"".equals(networkDelay)) {
@@ -120,7 +120,6 @@ public class MonitorCommunication {
     			
     			while ((s = inputStream.readLine()) != null) {
     				log.info("linux ping: {}",s);
-    				 s = s.substring(s.indexOf("time="),s.length());
     				 if(s.indexOf("time=") > 0) {
     					s = s.substring(s.indexOf("time=")+5,s.length()).replace(" ms", "");
     	    			speed.add(Float.valueOf(s));

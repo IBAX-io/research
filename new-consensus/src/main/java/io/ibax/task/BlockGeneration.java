@@ -63,6 +63,7 @@ public class BlockGeneration {
 								log.info("package node ip:{},port:{}",channelContext.getServerNode().getIp(),channelContext.getServerNode().getPort());
 								if(nextNode.getIp().equals(channelContext.getServerNode().getIp()) && nextNode.getPort()==channelContext.getServerNode().getPort()) {
 									send(channelContext);
+									break;
 								}
 							}
 						}else {
