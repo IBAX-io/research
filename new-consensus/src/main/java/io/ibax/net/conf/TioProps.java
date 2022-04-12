@@ -44,6 +44,12 @@ public class TioProps {
 	 * server-bound ip
 	 */
 	private String serverIp;
+	
+	private boolean genesisNode;
+	
+	private String publicKey;
+	
+	private String privateKey;
 
 	private LinkedHashMap<String, Object> nodes;
 
@@ -85,6 +91,30 @@ public class TioProps {
 
 	public void setServerIp(String serverIp) {
 		this.serverIp = serverIp;
+	}
+
+	public boolean isGenesisNode() {
+		return genesisNode;
+	}
+
+	public void setGenesisNode(boolean genesisNode) {
+		this.genesisNode = genesisNode;
+	}
+
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
+
+	public String getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(String privateKey) {
+		this.privateKey = privateKey;
 	}
 
 	public List<Node> getNodes() {

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.tio.client.ClientChannelContext;
 import org.tio.core.ChannelContext;
 import org.tio.core.stat.ChannelStat;
@@ -21,14 +20,14 @@ import org.tio.utils.lock.SetWithLock;
 import io.ibax.mapper.NodeMapper;
 import io.ibax.model.Node;
 import io.ibax.net.base.ActiveStatus;
-import io.ibax.net.client.HelloClientStarter;
+import io.ibax.net.client.ClientContextConfig;
 
 /**
  * Monitor whether the network of all packaging nodes is smooth
  * @author ak
  *
  */
-@Component
+//@Component
 public class MonitorCommunication {
 	private static Logger log = LoggerFactory.getLogger(MonitorCommunication.class);
 	
@@ -38,12 +37,14 @@ public class MonitorCommunication {
 
 	@Autowired
 	private NodeMapper nodeMapper;
+	@Autowired
+	private ClientContextConfig clientContextConfig;
 	
 	@Scheduled(fixedRate = 2000)
 	public void monitorNodes(){
 		log.info("Monitor all packaging nodes......");
 		
-		SetWithLock<ChannelContext> setWithLock = HelloClientStarter.getClientTioConfig().connections;
+		SetWithLock<ChannelContext> setWithLock = clientContextConfig.clientTioConfig().connections;
 		log.info("Monitor add nodes connections:{}",setWithLock.size());
 		
 		ReadLock readLock = setWithLock.readLock();

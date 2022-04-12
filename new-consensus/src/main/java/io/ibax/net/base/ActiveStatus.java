@@ -4,7 +4,6 @@ import lombok.Getter;
 
 /**
  * Node communication status
- * @author AK
  *
  */
 public interface ActiveStatus {

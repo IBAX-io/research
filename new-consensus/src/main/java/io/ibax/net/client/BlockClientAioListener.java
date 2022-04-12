@@ -1,7 +1,5 @@
 package io.ibax.net.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
@@ -10,23 +8,11 @@ import org.tio.core.intf.Packet;
 import io.ibax.event.NodesConnectedEvent;
 import io.ibax.net.ApplicationContextProvider;
 
-/**
- * 
- * @author ak
- *
- */
-public class HelloClientAioListener implements TioClientListener{
-	private static Logger logger = LoggerFactory.getLogger(HelloClientAioListener.class);
+public class BlockClientAioListener implements TioClientListener {
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 			throws Exception {
-//		if (isConnected) {
-//            logger.info("connection succeeded：server ip:{}", channelContext.getServerNode());
-//            Tio.bindGroup(channelContext, "blockchain-client");
-//        } else {
-//            logger.info("Connection failed：server ip:{}" , channelContext.getServerNode());
-//        }
 		ApplicationContextProvider.publishEvent(new NodesConnectedEvent(channelContext));
 	}
 
@@ -53,7 +39,7 @@ public class HelloClientAioListener implements TioClientListener{
 	@Override
 	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove)
 			throws Exception {
-		 Tio.unbindGroup(channelContext);
+		Tio.unbindGroup(channelContext);
 	}
 
 }

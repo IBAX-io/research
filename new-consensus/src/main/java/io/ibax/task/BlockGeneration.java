@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.tio.client.ClientChannelContext;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
@@ -18,10 +17,9 @@ import com.alibaba.fastjson.JSONObject;
 
 import io.ibax.mapper.NodeMapper;
 import io.ibax.model.Node;
-import io.ibax.net.base.ActiveStatus;
 import io.ibax.net.base.HelloPacket;
 import io.ibax.net.base.NodeStatus;
-import io.ibax.net.client.HelloClientStarter;
+import io.ibax.net.client.ClientContextConfig;
 import io.ibax.net.conf.TioProps;
 
 /**
@@ -29,13 +27,15 @@ import io.ibax.net.conf.TioProps;
  * @author ak
  *
  */
-@Component
+//@Component
 public class BlockGeneration {
 	private static Logger log = LoggerFactory.getLogger(BlockGeneration.class);
 	@Autowired
 	private TioProps properties;
 	@Autowired
 	private NodeMapper nodeMapper;
+	@Autowired
+	private ClientContextConfig clientContextConfig;
 	
 	@Scheduled(fixedRate = 4000)
 	public void blockGeneration(){
@@ -46,7 +46,7 @@ public class BlockGeneration {
 				if(node.getNodeStatus()==NodeStatus.LEADER ) {
 					log.info("start block generation...node info：{}",node.toString());
 					
-					SetWithLock<ChannelContext> setWithLock = HelloClientStarter.getClientTioConfig().connecteds;
+					SetWithLock<ChannelContext> setWithLock = clientContextConfig.clientTioConfig().connections;
 					ReadLock readLock = setWithLock.readLock();
 					readLock.lock();
 					try {

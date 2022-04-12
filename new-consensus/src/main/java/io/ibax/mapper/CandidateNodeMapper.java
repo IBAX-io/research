@@ -1,6 +1,7 @@
 package io.ibax.mapper;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,5 +26,5 @@ public interface CandidateNodeMapper {
 	 * get candidate nodes
 	 * @return
 	 */
-	public List<CandidateNode> getCandidateNodes();
+	public Vector<CandidateNode> getCandidateNodes();
 }
